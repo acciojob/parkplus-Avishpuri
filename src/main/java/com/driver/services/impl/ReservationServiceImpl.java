@@ -26,14 +26,14 @@ public class ReservationServiceImpl implements ReservationService {
         //Reserve a spot in the given parkingLot such that the total price is minimum. Note that the price per hour for each spot is different
         //Note that the vehicle can only be parked in a spot having a type equal to or larger than given vehicle
         //If parkingLot is not found, user is not found, or no spot is available, throw "Cannot make reservation" exception.
-
+        try {
             Reservation reservation = new Reservation(timeInHours);
             User user = userRepository3.findById(userId).get();
             ParkingLot parkingLot = parkingLotRepository3.findById(parkingLotId).get();
             reservation.setUser(user);
             List<Spot> spots = parkingLot.getSpotList();
             Spot spot = null;
-            int wheels=0;
+            int wheels = 0;
             int price = Integer.MAX_VALUE;
             for (Spot spot1 : spots) {
                 if (spot1.getSpotType() == SpotType.TWO_WHEELER) {
@@ -49,7 +49,7 @@ public class ReservationServiceImpl implements ReservationService {
                 }
             }
             if (spot == null) {
-                throw new Exception();
+                throw new Exception("Cannot make reservation");
             }
             reservation.setSpot(spot);
             spot.setOccupied(true);
@@ -58,6 +58,9 @@ public class ReservationServiceImpl implements ReservationService {
             spotRepository3.save(spot);
             userRepository3.save(user);
             return reservation;
-
+        }
+        catch (Exception e){
+            throw new Exception("Cannot make reservation");
+        }
     }
 }

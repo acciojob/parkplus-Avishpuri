@@ -26,17 +26,38 @@ public class ReservationServiceImpl implements ReservationService {
         //Reserve a spot in the given parkingLot such that the total price is minimum. Note that the price per hour for each spot is different
         //Note that the vehicle can only be parked in a spot having a type equal to or larger than given vehicle
         //If parkingLot is not found, user is not found, or no spot is available, throw "Cannot make reservation" exception.
-        User user=userRepository3.findById(userId).get();
-        ParkingLot parkingLot=parkingLotRepository3.findById(parkingLotId).get();
-       Spot spot=new Spot();
 
-       spot.getParkingLot().setId(parkingLotId);
-       if(spot.isOccupied()==false){
-           throw new Exception("Cannot make reservation");
-       }
-       Reservation reservation=new Reservation();
-       reservation.setSpot(spot);
-       reservationRepository3.save(reservation);
-       return reservation;
+            Reservation reservation = new Reservation(timeInHours);
+            User user = userRepository3.findById(userId).get();
+            ParkingLot parkingLot = parkingLotRepository3.findById(parkingLotId).get();
+            reservation.setUser(user);
+            List<Spot> spots = parkingLot.getSpotList();
+            Spot spot = null;
+            int wheels=0;
+            int price = Integer.MAX_VALUE;
+            for (Spot spot1 : spots) {
+                if (spot1.getSpotType() == SpotType.TWO_WHEELER) {
+                    wheels = 2;
+                } else if (spot1.getSpotType() == SpotType.FOUR_WHEELER) {
+                    wheels = 4;
+                } else {
+                    wheels = 100;
+                }
+                if (!spot1.getOccupied() && wheels > numberOfWheels && spot1.getPricePerHour() < price) {
+                    spot = spot1;
+                    price = spot1.getPricePerHour();
+                }
+            }
+            if (spot == null) {
+                throw new Exception();
+            }
+            reservation.setSpot(spot);
+            spot.setOccupied(true);
+            user.getReservationList().add(reservation);
+            spot.getReservationList().add(reservation);
+            spotRepository3.save(spot);
+            userRepository3.save(user);
+            return reservation;
+
     }
 }

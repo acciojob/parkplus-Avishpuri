@@ -25,7 +25,7 @@ public class Spot {
     @JoinColumn
     private ParkingLot parkingLot;
 
-    @OneToMany
+    @OneToMany(mappedBy = "spot",cascade = CascadeType.ALL)
     private List<Reservation> reservationList=new ArrayList<>();
 
     public int getId() {
@@ -52,7 +52,7 @@ public class Spot {
         this.pricePerHour = pricePerHour;
     }
 
-    public boolean isOccupied() {
+    public boolean getOccupied() {
         return occupied;
     }
 

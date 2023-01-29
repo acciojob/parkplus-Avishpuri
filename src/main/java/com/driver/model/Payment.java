@@ -17,6 +17,7 @@ public class Payment {
     }
     public Payment(){}
     @OneToOne
+    @JoinColumn
     private Reservation reservation;
 
     public int getId() {
